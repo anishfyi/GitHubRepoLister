@@ -1,24 +1,40 @@
 import React, { useEffect, useState } from "react";
 import ReposComponent from "../Repos/RepositoryComponent";
+import { fetchWithRateLimitHandling, mockUser } from "../../services/MockService";
 
 const PaginationComponent = (props) => {
-  const [loading, setLoading] = useState(true);
   const { username } = props;
   const [pages, setPages] = useState({
     page: 1,
     total_pages: 0,
   });
+  const [rateLimitExceeded, setRateLimitExceeded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      // First fetch user info to get total repo count
-      const response = await fetch(`https://api.github.com/users/${username}`);
-      const userData = await response.json();
-      
-      // Calculate total pages based on public_repos count
-      const totalPages = Math.ceil(userData.public_repos / 10);
-      setPages({ page: 1, total_pages: totalPages });
-      setLoading(false);
+      try {
+        // Use our custom fetch function with rate limit handling
+        setIsLoading(true);
+        const response = await fetchWithRateLimitHandling(`https://api.github.com/users/${username}`);
+        const userData = await response.json();
+        
+        // Set rate limit flag if needed
+        if (response.rateLimited) {
+          setRateLimitExceeded(true);
+        }
+        
+        // Calculate total pages based on public_repos count
+        const totalPages = Math.ceil(userData.public_repos / 10);
+        setPages({ page: 1, total_pages: totalPages });
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Fallback to mock data on error
+        setRateLimitExceeded(true);
+        setPages({ page: 1, total_pages: Math.ceil(mockUser.public_repos / 10) });
+        setIsLoading(false);
+      }
     };
     
     fetchUserInfo();
@@ -46,12 +62,27 @@ const PaginationComponent = (props) => {
 
   return (
     <div className="pagination">
-      <ReposComponent page={pages.page} username={username} />
-      <div className="pages_pgn">
-        <div className="page-nos">
-          {makeButtons(pages.total_pages)}
+      {rateLimitExceeded && (
+        <div className="rate-limit-warning">
+          <p>GitHub API rate limit exceeded. Showing mock data.</p>
         </div>
-      </div>
+      )}
+      {isLoading ? (
+        <div className="loading-pagination">Loading pagination...</div>
+      ) : (
+        <>
+          <ReposComponent 
+            page={pages.page} 
+            username={username} 
+            rateLimitExceeded={rateLimitExceeded} 
+          />
+          <div className="pages_pgn">
+            <div className="page-nos">
+              {makeButtons(pages.total_pages)}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
