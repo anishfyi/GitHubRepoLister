@@ -41,7 +41,7 @@ const ReposComponent = (props) => {
     <>
       {loading ? (
         <div className="loader">
-          <Circles height="120" width="120" color="#000000" visible={true} />
+          <Circles height="120" width="120" color="#2563eb" visible={true} />
           <h4>Loading</h4>
         </div>
       ) : error ? (

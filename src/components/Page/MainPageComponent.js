@@ -1,31 +1,45 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../../App.css";
+import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
-  const naigate = useNavigate();
+  const navigate = useNavigate();
   const [inputName, setInputName] = useState("");
+  
   const changeName = (e) => {
     setInputName(e.target.value);
   };
-  const submit = (e) => {
-    if (e.key === "Enter") {
-      return naigate(`/${inputName}`);
+  
+  const submit = () => {
+    if (inputName.trim()) {
+      navigate(`/${inputName}`);
     }
   };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      submit();
+    }
+  };
+  
   return (
     <div className="container">
       <div className="search-container">
-        <h1>GitHub Repository Lister: </h1>
+        <h4>GitHub Repository Explorer</h4>
         <input
           type="text"
           placeholder="Enter GitHub Username"
-          onChange={(e) => changeName(e)}
-          onKeyDown={(e) => submit(e)}
+          value={inputName}
+          onChange={changeName}
+          onKeyDown={handleKeyDown}
+          autoFocus
         />
-        <Link to={`/${inputName}`}>
-          <button className="submit">Submit</button>
-        </Link>
+        <button 
+          className="submit" 
+          onClick={submit}
+          disabled={!inputName.trim()}
+        >
+          Explore Repositories
+        </button>
       </div>
     </div>
   );

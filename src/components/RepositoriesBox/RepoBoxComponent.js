@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Card from 'react-bootstrap/Card';
-import { Circles } from "react-loader-spinner";
 
 const RepoBox = (props) => {
   const { repo } = props;
@@ -9,10 +7,15 @@ const RepoBox = (props) => {
   
   useEffect(() => {
     const fetchLanguages = async (languages_url) => {
-      const response = await fetch(languages_url);
-      const data = await response.json();
-      setLanguages(Object.keys(data));
-      setLoaded(true);
+      try {
+        const response = await fetch(languages_url);
+        const data = await response.json();
+        setLanguages(Object.keys(data));
+      } catch (error) {
+        console.error("Error fetching languages:", error);
+      } finally {
+        setLoaded(true);
+      }
     };
     
     if (repo.languages_url) {
@@ -21,23 +24,23 @@ const RepoBox = (props) => {
   }, [repo.languages_url]);
   
   return (
-    <Card border="secondary" style={{ width: '28rem' }}>
-      <Card.Header>{repo.name}</Card.Header>
-        <div className="card-component" key={repo.id}>
-          <Card.Text><p className="repo-desc">{repo.description?.substring(0, 25)}...</p>
-          <div className="repo-languages">
-          {(
-            <>
-              {languages.map((language) => (
-                <span className="repo-lang" key={language}>
-                  {language}
-                </span>
-              ))}
-            </>
-          )}
-      </div></Card.Text>
+    <div className="card-component" key={repo.id}>
+      <h3 className="repo-name">{repo.name}</h3>
+      <p className="repo-desc">
+        {repo.description 
+          ? repo.description.length > 100 
+            ? `${repo.description.substring(0, 100)}...` 
+            : repo.description
+          : "No description available"}
+      </p>
+      <div className="repo-languages">
+        {languages.map((language) => (
+          <span className="repo-lang" key={language}>
+            {language}
+          </span>
+        ))}
+      </div>
     </div>
-    </Card>
   );
 };
 

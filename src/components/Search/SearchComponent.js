@@ -70,11 +70,11 @@ const SearchComponent = () => {
     <>
       {!user.loaded ? (
         <div className="loader">
-          <Circles height="120" width="120" color="#000000" visible={true} />
+          <Circles height="120" width="120" color="#2563eb" visible={true} />
           <h4>Loading</h4>
         </div>
       ) : error ? (
-        <div className="error-container">
+        <div className="error-message">
           <h2>Error: {error}</h2>
         </div>
       ) : user.login ? (
