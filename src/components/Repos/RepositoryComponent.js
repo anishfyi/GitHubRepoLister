@@ -8,21 +8,27 @@ const ReposComponent = (props) => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const loadPage = async (page_no) => {
-      const response = await fetch(
-        `https://api.github.com/users/${username}/repos?per_page=10&page=${page_no}`
-      );
-      const data = await response.json();
-      setRepos(data);
       setLoading(true);
+      try {
+        const response = await fetch(
+          `https://api.github.com/users/${username}/repos?per_page=10&page=${page_no}`
+        );
+        const data = await response.json();
+        setRepos(data);
+      } catch (error) {
+        console.error("Error fetching repositories:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadPage(page);
-  }, [page]);
+  }, [page, username]);
 
   return (
     <>
-      {!loading ? (
+      {loading ? (
         <div className="loader">
-          <Circles height="120" width="120" color="#000000" visible={loading} />
+          <Circles height="120" width="120" color="#000000" visible={true} />
           <h4>Loading</h4>
         </div>
       ) : (

@@ -5,23 +5,24 @@ const PaginationComponent = (props) => {
   const [loading, setLoading] = useState(true);
   const { username } = props;
   const [pages, setPages] = useState({
-    page: 0,
+    page: 1,
     total_pages: 0,
-  
   });
 
   useEffect(() => {
-    const fetchRepos = async (total_pages) => {
-      const response = await fetch(
-        `https://api.github.com/users/${username}/repos`
-      );
-      const data = await response.json();
-      setPages({ page: 1, total_pages: (data.length / 10)+1 });
-      setLoading(true);
+    const fetchUserInfo = async () => {
+      // First fetch user info to get total repo count
+      const response = await fetch(`https://api.github.com/users/${username}`);
+      const userData = await response.json();
+      
+      // Calculate total pages based on public_repos count
+      const totalPages = Math.ceil(userData.public_repos / 10);
+      setPages({ page: 1, total_pages: totalPages });
+      setLoading(false);
     };
-    fetchRepos();
-  }, []);
-
+    
+    fetchUserInfo();
+  }, [username]);
 
   const makeButtons = () => {
     let buttons = [];
