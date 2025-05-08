@@ -24,7 +24,7 @@ const MainPage = () => {
   return (
     <div className="container">
       <div className="search-container">
-        <h4>GitHub Repository Explorer</h4>
+        <h4>GitHub Repository Lister</h4>
         <input
           type="text"
           placeholder="Enter GitHub Username"
@@ -38,7 +38,7 @@ const MainPage = () => {
           onClick={submit}
           disabled={!inputName.trim()}
         >
-          Explore Repositories
+          List Repositories
         </button>
       </div>
     </div>
